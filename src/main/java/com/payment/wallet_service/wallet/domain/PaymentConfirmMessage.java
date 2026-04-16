@@ -2,7 +2,9 @@ package com.payment.wallet_service.wallet.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Builder
 public record PaymentConfirmMessage (
@@ -20,11 +22,9 @@ public record PaymentConfirmMessage (
         Long amount
     ){
     }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class MessageType {
+        public static final String PAYMENT_CONFIRM_MESSAGE = "payment-confirm-message";
+    }
 }
-
-
-
-
-
-
-
