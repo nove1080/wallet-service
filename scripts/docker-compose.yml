@@ -1,0 +1,17 @@
+services:
+  wallet-db:
+    image: mysql:8.0.42
+    ports:
+      - "13311:3306"
+    restart: unless-stopped
+    volumes:
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: payment_wallet
+      TZ: Asia/Seoul
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
