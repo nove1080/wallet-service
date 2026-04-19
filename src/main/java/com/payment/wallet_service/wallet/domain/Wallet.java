@@ -30,7 +30,10 @@ public record Wallet(
     }
 
     private BigDecimal addBalance(List<PaymentOrder> paymentOrders) {
-        return balance.add(BigDecimal.valueOf(paymentOrders.stream().mapToLong(PaymentOrder::amount).sum()));
+        return balance.add(paymentOrders.stream()
+            .filter(isMyTransaction())
+            .map(it -> BigDecimal.valueOf(it.amount()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private Predicate<PaymentOrder> isMyTransaction() {
