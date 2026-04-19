@@ -2,6 +2,7 @@ package com.payment.wallet_service.wallet.infrastructure.jpa.mapper;
 
 import com.payment.wallet_service.wallet.domain.Wallet;
 import com.payment.wallet_service.wallet.infrastructure.jpa.entity.JpaWalletEntity;
+import java.util.ArrayList;
 
 public abstract class JpaWalletMapper {
 
@@ -10,6 +11,7 @@ public abstract class JpaWalletMapper {
             .id(jpaWalletEntity.getId())
             .memberId(jpaWalletEntity.getMemberId())
             .balance(jpaWalletEntity.getBalance())
+            .transactions(new ArrayList<>())
             .build();
     }
 
