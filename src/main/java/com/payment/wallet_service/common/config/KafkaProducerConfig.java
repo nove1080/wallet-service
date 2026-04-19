@@ -30,7 +30,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public Map<String, Object> producerConfigs() {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        Map<String, Object> props = kafkaProperties.buildProducerProperties();
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getKeySerializer());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getValueSerializer());
         props.put(JacksonJsonSerializer.TYPE_MAPPINGS, "WalletEventMessage:com.payment.wallet_service.wallet.domain.WalletEventMessage");
