@@ -10,8 +10,14 @@ public abstract class JpaWalletMapper {
             .id(jpaWalletEntity.getId())
             .memberId(jpaWalletEntity.getMemberId())
             .balance(jpaWalletEntity.getBalance())
-            .createdAt(jpaWalletEntity.getCreatedAt())
-            .updatedAt(jpaWalletEntity.getUpdatedAt())
+            .build();
+    }
+
+    public static JpaWalletEntity mapToEntity(Wallet wallet) {
+        return JpaWalletEntity.builder()
+            .id(wallet.id())
+            .memberId(wallet.memberId())
+            .balance(wallet.balance())
             .build();
     }
 
