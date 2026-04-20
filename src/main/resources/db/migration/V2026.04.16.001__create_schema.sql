@@ -9,8 +9,9 @@ CREATE TABLE wallet
     CONSTRAINT uk_wallet_member_id UNIQUE (member_id)
 );
 
-CREATE TABLE wallet_transaction_history (
-    wallet_transaction_history_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE wallet_transaction
+(
+    wallet_transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     wallet_id BIGINT NOT NULL,
     transaction_type VARCHAR(255) NOT NULL COMMENT '거래 유형 - 입금, 출금',
     amount DECIMAL(19, 2) NOT NULL COMMENT '거래 금액',
