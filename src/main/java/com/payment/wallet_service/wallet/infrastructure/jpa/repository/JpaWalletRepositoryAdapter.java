@@ -43,6 +43,7 @@ public class JpaWalletRepositoryAdapter implements WalletRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Boolean existsSettlement(String orderId) {
         return jpaWalletTransactionRepository.existsByOrderId(orderId);
     }
