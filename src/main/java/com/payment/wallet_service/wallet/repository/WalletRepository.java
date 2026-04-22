@@ -10,4 +10,6 @@ public interface WalletRepository {
 
     void saveAll(List<Wallet> wallets);
 
+    Boolean existsSettlement(String orderId);
+
 }

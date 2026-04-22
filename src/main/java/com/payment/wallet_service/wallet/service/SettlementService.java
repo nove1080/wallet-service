@@ -18,8 +18,13 @@ import org.springframework.stereotype.Service;
 public class SettlementService {
 
     private final WalletRepository walletRepository;
+    private final DuplicateMessageFilter duplicateMessageFilter;
 
     public WalletEventMessage settle(PaymentConfirmMessage confirmMessage) {
+        if (duplicateMessageFilter.isAlreadyProcessed(confirmMessage)) {
+            return createWalletEventMessage(confirmMessage, MessageType.SETTLEMENT_SUCCESS);
+        }
+
         List<Wallet> settledWallets = doSettle(confirmMessage);
         walletRepository.saveAll(settledWallets);
 
