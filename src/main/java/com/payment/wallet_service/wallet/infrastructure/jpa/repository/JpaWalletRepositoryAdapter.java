@@ -41,6 +41,11 @@ public class JpaWalletRepositoryAdapter implements WalletRepository {
                 .map(JpaWalletTransactionMapper::mapToEntity)
                 .toList());
     }
+
+    @Override
+    public Boolean existsSettlement(String orderId) {
+        return jpaWalletTransactionRepository.existsByOrderId(orderId);
+    }
 }
 
 interface JpaWalletRepository extends JpaRepository<JpaWalletEntity, Long> {
@@ -48,5 +53,7 @@ interface JpaWalletRepository extends JpaRepository<JpaWalletEntity, Long> {
 }
 
 interface JpaWalletTransactionRepository extends JpaRepository<JpaWalletTransactionEntity, Long> {
+
+    Boolean existsByOrderId(String orderId);
 
 }
