@@ -39,7 +39,7 @@ public class KafkaConsumerConfig {
 
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
             (record, exception) -> {
-                String topic = record.topic() + "-dlt";
+                String topic = "settlement-dlt";
                 return new TopicPartition(topic, record.partition());
             });
 
