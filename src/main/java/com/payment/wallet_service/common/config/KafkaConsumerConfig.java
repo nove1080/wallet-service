@@ -15,6 +15,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 @EnableKafka
 @RequiredArgsConstructor
@@ -24,9 +25,11 @@ public class KafkaConsumerConfig {
     private final KafkaProperties kafkaProperties;
 
     @Bean
-    KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, PaymentConfirmMessage>> paymentConfirmKafkaListenerContainerFactory() {
+    KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, PaymentConfirmMessage>> paymentConfirmKafkaListenerContainerFactory(
+        KafkaTransactionManager<String, Object> kafkaTransactionManager) {
         ConcurrentKafkaListenerContainerFactory<String, PaymentConfirmMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(paymentConfirmConsumerFactory());
+        factory.getContainerProperties().setKafkaAwareTransactionManager(kafkaTransactionManager);
         return factory;
     }
 
@@ -34,7 +37,9 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, PaymentConfirmMessage> paymentConfirmConsumerFactory() {
         Map<String, Object> props = consumerConfigs();
         props.put(JacksonJsonDeserializer.TYPE_MAPPINGS, "PaymentConfirmMessage:com.payment.wallet_service.wallet.domain.PaymentConfirmMessage");
-        return new DefaultKafkaConsumerFactory(props);
+        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
