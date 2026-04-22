@@ -4,6 +4,7 @@ import com.payment.wallet_service.wallet.domain.PaymentConfirmMessage;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +13,14 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
+import org.springframework.util.backoff.FixedBackOff;
 
 @EnableKafka
 @RequiredArgsConstructor
@@ -26,10 +31,21 @@ public class KafkaConsumerConfig {
 
     @Bean
     KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, PaymentConfirmMessage>> paymentConfirmKafkaListenerContainerFactory(
+        KafkaTemplate<String, Object> kafkaTemplate,
         KafkaTransactionManager<String, Object> kafkaTransactionManager) {
         ConcurrentKafkaListenerContainerFactory<String, PaymentConfirmMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(paymentConfirmConsumerFactory());
         factory.getContainerProperties().setKafkaAwareTransactionManager(kafkaTransactionManager);
+
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
+            (record, exception) -> {
+                String topic = record.topic() + "-dlt";
+                return new TopicPartition(topic, record.partition());
+            });
+
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 2L));
+
+        factory.setCommonErrorHandler(errorHandler);
         return factory;
     }
 
